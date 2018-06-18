@@ -1,0 +1,316 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Webpack Plugin</title>
+		<link rel="shortcut icon" href="./img/logo.svg">
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<!--- Section 1 -->
+				<section>
+					<h1>How to Write a Wepack Plugin</h1>
+					<img src="./img/webpack-logo.png" alt="" style="height: 300px;">
+				</section>
+				<!--- Section 2 -->
+				<section>
+					<h3>A bit about Webpack 📦</h3>
+					<p>
+						<ul>
+							<li>Static Module bundler for modern JS apps</li>
+							<li>It recursively builds a dependency graph that includes every module your application needs</li>
+							<li>Packages all of those modules into bundles</li>
+						</ul>
+					</p>
+				</section>
+				<!--- Section 3 -->
+				<section>
+					<section>
+						<h3>How exactly webpack is different from other available tools</h3>
+					</section>
+					<section>
+						<h4>What we do to run an application?</h4>
+						<img src="./img/pattern.png" alt="">
+					</section>
+					<section>
+						<img src="./img/gulp.png" alt="">
+						<p>
+							These bundlers manually specify a large collection of files that are going to be <span class="highlight">&nbsp;concatneted 🔗</span> &nbsp;together
+						</p>
+					</section>
+					<section>
+						<img src="./img/webpack.png" alt="">
+						<p>
+							Webpack uses the concept called <br> <span class="highlight">&nbsp;dependancy graph📈</span>
+							<!-- <ul>
+								<li>It starts at the entry point then its gonna parse the entire file</li>
+								<li>Its gonna look for syntax like export, import require, marking them as dependancies</li>
+								<li>Then webpack goes each one of those modules and repeats the process</li>
+							</ul> -->
+						</p>
+					</section>
+					<section>
+						<img src="./img/person.png" alt="">
+						<h3>In webpack, everything is a module</h3>
+					</section>
+				</section>
+				<!--- Section 4 -->
+				<section>
+					<section>
+						<h2>webpack.config ⚙</h2>
+						<p>Four Core Concepts</p>
+						<!-- <ul>
+							<li>Webpack is fed via a configuration object</li>
+							<li>There are 4 Core Concepts needed to understand a webpack.config</li>
+						</ul> -->
+					</section>
+					<section>
+						<h3>Entry 📥</h3>
+							<pre>
+								<code data-trim data-noescape>
+									const config = {
+										entry: './src/app.js'
+									};
+								</code>
+							</pre>
+						<pre>
+							<code data-trim data-noescape>
+								const config = {
+									entry: {
+										app: './src/app.js',
+										vendors: './src/vendors.js',
+										polyfills: [ './src/polyfills.ts' ],
+										styles: [ './src/styles.scss' ],
+										pageOne: './src/PageOne.index.js',
+										...
+									}
+								};
+							</code>
+						</pre>
+					</section>
+					<section>
+							<h3>Output 📤</h3>
+							<pre>
+								<code data-trim data-noescape>
+									module.exports = {
+										output: {
+											filename: 'bundle.js',
+											path: '/dist'
+										}
+									};
+								</code>
+							</pre>
+							<pre>
+								<code data-trim data-noescape>
+									module.exports = {
+										output: {
+											filename: '[name].js',
+											path: __dirname + '/dist'
+										}
+									};
+								</code>
+							</pre>
+						</section>
+						<section>
+							<h3>Loader 🔃</h3>
+							<p>A transformation you apply to a single file to make it into a javascript module</p>
+							
+							</ul>
+							<pre>
+								<code data-trim data-noescape>
+										module.exports = {
+											module: {
+												rules: [
+													{ test: /\.css$/, use: 'css-loader' },
+													{ test: /\.ts$/, use: 'ts-loader' }
+												]
+											}
+										};
+								</code>
+							</pre>
+						</section>
+						<section>
+							<h3>Plugin 🔌</h3>
+							<p>
+								Helps customise and extend webpack behaviour								
+							</p>
+							<pre>
+								<code data-trim data-noescape>
+										module.exports = {
+											plugins: [
+												new webpack.optimize.UglifyJsPlugin(),
+												new HtmlWebpackPlugin({template: './src/index.html'})
+											]
+										};
+								</code>
+							</pre>
+						</section>
+					</section>
+
+					<!--- Section 5 -->
+					<section>
+						<section>
+							<h2>Webpack Lifecycle ♽</h2>
+						</section>
+						<section>
+							<h4>Compiler 👼🏼</h4>
+							<ul class="small">
+								<li>Top level entity / Webpack Environment</li>
+								<li>Central disptach system</li>
+								<li>Contains: start, stop, a file has changed so rebundle</li>
+							</ul>
+							<pre>
+								<code data-trim data-noescape>
+										const webpack = require('webpack');
+										const compiler = webpack(..Some Webpack Config..);
+								</code>
+						</pre>
+						</section>
+						<section>
+							<h4>Compilation 👑</h4>
+							<ul class="small">
+								<li>Brain of the whole system</li>
+								<li>Created with every detected change</li>
+								<li>Based on compilation, code is moved, split, mapped, chunked and add it to fit into the right place</li>
+								<li>Represents present state of the app</li>
+								<li>Contains: dependency graph, traversal algorithm</li>
+							</ul>
+						</section>
+						<section>
+							<h4>Module Resolver 🔍</h4>
+							<ul class="small">
+								<li>Finds the file you want to process
+										<!-- sends it to next step -->
+								</li>
+								<li>Sits on top of normal node module resolution pattern</li>
+							</ul>
+						</section>
+						<section>
+							<h4>Module Factories 🏭</h4>
+							<ul class="small">
+								<li>Takes in successfully resolved requests</li>
+								<li>Creates modules from them</li>
+							</ul>
+						</section>
+						<section>
+							<h4>Parser 📠</h4>
+							<ul class="small">
+								<!-- <li>Creates an AST for that module object</li> -->
+								<li>If the codes not JavaScript, Loaders will convert them to JavaScript</li>
+								<li>Finds all require, export, import, require.ensure, AMD requires and creates a graph</li>
+							</ul>
+						</section>
+						<section>
+							<h4>Templates 📋</h4>
+							<ul class="small">
+								<li>Data binding for your module</li>
+								<li>There's template for every type of abstraction that we have available in webpack (chunks template, webpack bootstrap template, depen template)</li>
+							</ul>
+						</section>
+						<section>
+							<h4>Tapable 💁🏻</h4>
+							<ul class="small">
+								<li>It's backbone of entire plugin system</li>
+								<li>Works like an event emitter</li>
+								<li>All the above listed entities are tapable instances</li>
+							</ul>
+						</section>
+					</section>
+					<section>
+						<h3>Plugin 🔌</h3>
+						<ul>
+							<li>Inject functionality into webpacks lifecycle</li>
+							<li>When each hook is executed, the plugin will have full access to the current state of the compilation</li>
+						</ul>
+					</section>
+				<!--- Section 6 -->
+				<section>
+					<section>
+						<h3>Useful plugin patterns 👀</h3>
+						<ul class="small">
+							<li>Create customizations within webapck build system</li>
+							<li>Perform unique build modifications and customisation</li>
+							<li>Enhance the webpack runtime using middleware</li>
+							<li>...endless possibilities</li>
+						</ul>
+						<p class="right">All available callbacks are listed here, <a href="https://github.com/webpack/docs/wiki/plugins">Plugins API doc</a> </p>
+					</section>
+				</section>
+				<!--- Section 7 -->
+				<section>
+					<section>
+						<h3>Webpack Jargon 🎨</h3>
+					</section>
+					<section>
+						<h4>Chunks ☘</h4>
+						<p>A bundled file webpack has produced that contains portions of your dependency graph</p>
+					</section>
+					<section>
+						<h4>Bundler 💸</h4>
+						<p>A tool that looks into dependecy graph of your code and then concatnetes them while respecting dependency graph</p>
+					</section>
+					<section>
+						<h4>Presets 👨‍👩‍👧‍👦</h4>
+						<p>A set of predefined transformations put in one place</p>
+					</section>
+					<section>
+						<h4>Stats 📝</h4>
+						<p>Short for statistics.. shows changes happened in compilation object</p>
+					</section>
+				</section>
+
+				<!--- Section 8 -->
+				<section>
+						<h3>Resources 📚</h3>
+						<ul class="small">
+							<li><a href="https://webpack.js.org/">Official Documentation</a></li>
+							<li><a href="https://www.youtube.com/watch?v=WQue1AN93YU">Webpack Basics</a></li>
+							<li><a href="https://www.youtube.com/watch?v=4tQiJaFzuJ8">Everything is a Plugin</a></li>
+							<li><a href="https://github.com/webpack-contrib/awesome-webpack">Awesome webpack list</a></li>
+						</ul>
+				</section>
+
+				<!--- Section 9 -->
+				<section>
+					<h2>Thank You 🙏🏻</h2>
+				</section>
+
+
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
